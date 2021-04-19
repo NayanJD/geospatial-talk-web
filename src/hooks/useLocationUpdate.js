@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 
 export const useLocationUpdate = () => {
   const [ws, setWs] = useState(null);
-  const [lat, setLat] = useState(null);
-  const [long, setLong] = useState(null);
+  // const [lat, setLat] = useState(null);
+  // const [long, setLong] = useState(null);
+  const [coords, setCoords] = useState([]);
+  const [coordsObj, setCoordsObj] = useState({});
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
@@ -16,9 +18,17 @@ export const useLocationUpdate = () => {
       switch (msg.type) {
         case "location_update":
           if (msg.is_success) {
-            setLat(msg.data.latitude);
-            setLong(msg.data.longitude);
-            setUserId(msg.data.userId);
+            const { longitude, latitude, user_id: userId } = msg.data;
+
+            coordsObj[userId] = {
+              latitude,
+              longitude,
+            };
+
+            setCoordsObj({ ...coordsObj });
+            // setLat(msg.data.latitude);
+            // setLong(msg.data.longitude);
+            // setUserId(msg.data.userId);
           }
           break;
         default:
@@ -30,10 +40,6 @@ export const useLocationUpdate = () => {
     return () => ws && ws.close();
   }, []);
 
-  //   console.log(lat);
-  return {
-    latitude: lat,
-    longitude: long,
-    userId,
-  };
+  // console.log(coords);
+  return coordsObj;
 };
