@@ -38,12 +38,12 @@
 }
 
 .map-container {
-  display: block;
-  position: relative;
+  /* display: ; */
+  position: absolute;
   top: 0;
   right: 0;
   left: 0;
   bottom: 0;
-  width: '100px';
-  height: '100px';
+  /* width: '100px';
+  height: '100px'; */
   }
