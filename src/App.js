@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { reduce } from "lodash";
+import { reduce, forEach } from "lodash";
 import * as turf from "@turf/turf";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -14,6 +14,21 @@ mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
   "pk.eyJ1IjoibmF5YW5qIiwiYSI6ImNrbmFtZTVhcTBwMTcyeGxjOTE0N3AyMHMifQ._pHKxQv0HuH4HvnYygGJZg";
 
+function separateInsideOutsidePoints(coordsObj) {
+  const insideCoords = [],
+    outsideCoords = [];
+
+  forEach(coordsObj, (coord) => {
+    if (coord.isInside) {
+      insideCoords.push([coord.latitude, coord.longitude]);
+    } else {
+      outsideCoords.push([coord.latitude, coord.longitude]);
+    }
+  });
+
+  return [insideCoords, outsideCoords];
+}
+
 function App() {
   const mapContainer = useRef();
   const [lng, setLng] = useState(-70.9);
@@ -24,7 +39,10 @@ function App() {
 
   const coordsObj = useLocationUpdate();
 
-  console.log("coords ", coordsObj);
+  const [insideCoords, outsideCoords] = separateInsideOutsidePoints(coordsObj);
+
+  // console.log("insideCoords ", insideCoords);
+  // console.log("outsideCoords ", outsideCoords);
 
   useEffect(() => {
     // console.log(lat, lng);
@@ -39,8 +57,6 @@ function App() {
       ])
     );
 
-    console.log("center:: ", center.geometry.coordinates);
-
     const newMap = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
@@ -54,43 +70,57 @@ function App() {
     return () => map && map.remove();
   }, []);
 
-  console.log(hasMapLoaded);
   if (map && hasMapLoaded) {
-    console.log("Fly to...");
-    // map.flyTo({
-    //   center: [latitude, longitude],
-    // });
+    const insideSource = map.getSource("insidePoint");
+    const outsideSource = map.getSource("outsidePoint");
 
-    const source = map.getSource("point");
-
-    if (source) {
-      source.setData({
+    if (insideSource && outsideSource) {
+      insideSource.setData({
         type: "MultiPoint",
-        coordinates: reduce(
-          coordsObj,
-          (arr, coord) => {
-            arr.push([coord.latitude, coord.longitude]);
+        coordinates: insideCoords,
+      });
 
-            return arr;
-          },
-          []
-        ),
+      outsideSource.setData({
+        type: "MultiPoint",
+        coordinates: outsideCoords,
       });
       // map.panTo([latitude, longitude]);
     } else {
-      map.addSource("point", {
+      map.addSource("insidePoint", {
         type: "geojson",
         data: {
           type: "MultiPoint",
-          coordinates: reduce(
-            coordsObj,
-            (arr, coord) => {
-              arr.push([coord.latitude, coord.longitude]);
+          coordinates: insideCoords,
+        },
+      });
+      map.addLayer({
+        id: "insidePointCircle",
+        type: "circle",
+        source: "insidePoint",
+        paint: {
+          "circle-color": "#FF0000",
+          "circle-radius": 4,
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#ffffff",
+        },
+      });
 
-              return arr;
-            },
-            []
-          ),
+      map.addSource("outsidePoint", {
+        type: "geojson",
+        data: {
+          type: "MultiPoint",
+          coordinates: outsideCoords,
+        },
+      });
+      map.addLayer({
+        id: "outsidePointCircle",
+        type: "circle",
+        source: "outsidePoint",
+        paint: {
+          "circle-color": "#4264fb",
+          "circle-radius": 4,
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#ffffff",
         },
       });
 
@@ -148,18 +178,6 @@ function App() {
         paint: {
           "line-color": "#FF0000",
           "line-width": 3,
-        },
-      });
-
-      map.addLayer({
-        id: "circle",
-        type: "circle",
-        source: "point",
-        paint: {
-          "circle-color": "#4264fb",
-          "circle-radius": 3,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#ffffff",
         },
       });
     }
