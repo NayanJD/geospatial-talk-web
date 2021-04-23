@@ -33,6 +33,7 @@ export const useLocationUpdate = () => {
               latitude,
               longitude,
               isInside,
+              userId,
               timestamp: dayjs().valueOf(),
             };
 
