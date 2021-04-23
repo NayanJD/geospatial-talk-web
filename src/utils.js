@@ -12,8 +12,6 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
     type: "symbol",
     source: "insidePoint",
     layout: {
-      "icon-image": "custom-marker",
-      // get the title name from the source's "title" property
       "text-field": ["get", "title"],
       "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
       "text-offset": [0, 1.25],
@@ -27,7 +25,7 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
     source: "insidePoint",
     paint: {
       "circle-color": "#FF0000",
-      "circle-radius": 4,
+      "circle-radius": 6,
       "circle-stroke-width": 2,
       "circle-stroke-color": "#ffffff",
     },
@@ -41,7 +39,7 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
     source: "outsidePoint",
     paint: {
       "circle-color": "#4264fb",
-      "circle-radius": 4,
+      "circle-radius": 6,
       "circle-stroke-width": 2,
       "circle-stroke-color": "#ffffff",
     },
@@ -53,8 +51,6 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
     type: "symbol",
     source: "outsidePoint",
     layout: {
-      //   "icon-image": "custom-marker",
-      // get the title name from the source's "title" property
       "text-field": ["get", "title"],
       "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
       "text-offset": [0, 1.25],
