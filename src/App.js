@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { reduce, forEach } from "lodash";
+import { reduce, forEach, map } from "lodash";
 import * as turf from "@turf/turf";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -27,6 +27,32 @@ function separateInsideOutsidePoints(coordsObj) {
   });
 
   return [insideCoords, outsideCoords];
+}
+
+function getPointsGeoJson(arr) {
+  return map(arr, (coord) => {
+    return {
+      // feature for Mapbox DC
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: coord,
+      },
+      properties: {
+        title: "Mapbox DC",
+      },
+    };
+  });
+}
+
+function getPointsFeature(arr) {
+  return {
+    type: "geojson",
+    data: {
+      type: "FeatureCollection",
+      features: getPointsGeoJson(arr),
+    },
+  };
 }
 
 function App() {
@@ -63,37 +89,31 @@ function App() {
       center: center.geometry.coordinates,
       zoom: zoom,
     });
+
     newMap.on("load", function () {
       setHasMapLoaded(true);
-    });
-    setMap(newMap);
-    return () => map && map.remove();
-  }, []);
 
-  if (map && hasMapLoaded) {
-    const insideSource = map.getSource("insidePoint");
-    const outsideSource = map.getSource("outsidePoint");
+      let data = getPointsFeature(insideCoords);
+      console.log(JSON.stringify(data, null, 2));
 
-    if (insideSource && outsideSource) {
-      insideSource.setData({
-        type: "MultiPoint",
-        coordinates: insideCoords,
-      });
+      newMap.addSource("insidePoint", data);
 
-      outsideSource.setData({
-        type: "MultiPoint",
-        coordinates: outsideCoords,
-      });
-      // map.panTo([latitude, longitude]);
-    } else {
-      map.addSource("insidePoint", {
-        type: "geojson",
-        data: {
-          type: "MultiPoint",
-          coordinates: insideCoords,
+      // Add a symbol layer
+      newMap.addLayer({
+        id: "insidePointSymbol",
+        type: "symbol",
+        source: "insidePoint",
+        layout: {
+          "icon-image": "custom-marker",
+          // get the title name from the source's "title" property
+          "text-field": ["get", "title"],
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 1.25],
+          "text-anchor": "top",
         },
       });
-      map.addLayer({
+
+      newMap.addLayer({
         id: "insidePointCircle",
         type: "circle",
         source: "insidePoint",
@@ -104,7 +124,25 @@ function App() {
           "circle-stroke-color": "#ffffff",
         },
       });
+    });
+    setMap(newMap);
+    return () => map && map.remove();
+  }, []);
 
+  if (map && hasMapLoaded) {
+    const insideSource = map.getSource("insidePoint");
+    const outsideSource = map.getSource("outsidePoint");
+    const externalPolygonSource = map.getSource("externalPolygon");
+    const internalPolygonSource = map.getSource("internalPolygon");
+
+    if (!insideSource) {
+      console.log("insideCoords ", insideCoords);
+
+      if (insideCoords.length > 0) {
+      }
+    }
+
+    if (!outsideSource) {
       map.addSource("outsidePoint", {
         type: "geojson",
         data: {
@@ -123,7 +161,33 @@ function App() {
           "circle-stroke-color": "#ffffff",
         },
       });
+    }
 
+    if (insideSource) {
+      // console.log(getPointsFeature(insideCoords));
+      console.log(JSON.stringify(getPointsFeature(insideCoords), null, 2));
+      insideSource.setData({
+        type: "FeatureCollection",
+        features: getPointsGeoJson(insideCoords),
+      });
+    }
+
+    if (outsideSource) {
+      outsideSource.setData({
+        type: "MultiPoint",
+        coordinates: outsideCoords,
+      });
+    }
+
+    // map.addSource("insidePoint", {
+    //   type: "geojson",
+    //   data: {
+    //     type: "MultiPoint",
+    //     coordinates: insideCoords,
+    //   },
+    // });
+
+    if (!externalPolygonSource) {
       map.addSource("externalPolygon", {
         type: "geojson",
         data: {
@@ -152,7 +216,9 @@ function App() {
           "line-width": 3,
         },
       });
+    }
 
+    if (!internalPolygonSource) {
       map.addSource("internalPolygon", {
         type: "geojson",
         data: {

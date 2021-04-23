@@ -11,7 +11,6 @@ export const useLocationUpdate = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    console.log("running useEffect");
     const newWs = new WebSocket(
       "ws://127.0.0.1:8000/ws/factory/f2e4c51e-0947-4864-ab81-eeaace5a2c65"
     );
@@ -19,8 +18,6 @@ export const useLocationUpdate = () => {
     newWs.onmessage = (event) => {
       //   console.log(event);
       var msg = JSON.parse(event.data);
-
-      console.log(msg.data);
 
       switch (msg.type) {
         case "location_update":
