@@ -58,52 +58,50 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
     },
   });
 
-  newMap.addSource("externalPolygon", {
-    type: "geojson",
-    data: {
-      type: "Polygon",
-      coordinates: [
-        [
-          [77.56675674023597, 12.97777916687754],
-          [77.56692073403116, 12.961793459025358],
-          [77.60211549066315, 12.961951511517157],
-          [77.60214669168914, 12.961913026626107],
-          [77.60192255678578, 12.977782104468147],
-          [77.60193778047483, 12.977759778778221],
-          [77.57625692491092, 12.978035324664518],
-          [77.56675674023597, 12.97777916687754],
-        ],
-      ],
-    },
-  });
-  newMap.addLayer({
-    id: "externalPolygonOutline",
-    type: "line",
-    source: "externalPolygon",
-    layout: {},
-    paint: {
-      "line-color": "#000",
-      "line-width": 3,
-    },
-  });
+  // newMap.addSource("externalPolygon", {
+  //   type: "geojson",
+  //   data: {
+  //     type: "Polygon",
+  //     coordinates: [
+  //       [
+  //         [77.56675674023597, 12.97777916687754],
+  //         [77.56692073403116, 12.961793459025358],
+  //         [77.60211549066315, 12.961951511517157],
+  //         [77.60214669168914, 12.961913026626107],
+  //         [77.60192255678578, 12.977782104468147],
+  //         [77.60193778047483, 12.977759778778221],
+  //         [77.57625692491092, 12.978035324664518],
+  //         [77.56675674023597, 12.97777916687754],
+  //       ],
+  //     ],
+  //   },
+  // });
+  // newMap.addSource("externalPolygon", {
+  //   type: "geojson",
+  //   data: {
+  //     type: "Polygon",
+  //     coordinates: [],
+  //   },
+  // });
+  // newMap.addLayer({
+  //   id: "externalPolygonOutline",
+  //   type: "line",
+  //   source: "externalPolygon",
+  //   layout: {},
+  //   paint: {
+  //     "line-color": "#000",
+  //     "line-width": 3,
+  //   },
+  // });
 
   newMap.addSource("internalPolygon", {
     type: "geojson",
     data: {
       type: "Polygon",
-      coordinates: [
-        [
-          [77.5821887956082, 12.97670101824491],
-          [77.57395774910214, 12.968812905868674],
-          [77.58443109878624, 12.962938393986647],
-          [77.59276977584443, 12.970796975410693],
-          [77.59278479927548, 12.970742129648173],
-          [77.58679628017819, 12.974586766461343],
-          [77.5821887956082, 12.97670101824491],
-        ],
-      ],
+      coordinates: [],
     },
   });
+
   newMap.addLayer({
     id: "internalPolygonOutline",
     type: "line",
@@ -156,3 +154,12 @@ export function getPointsFeature(arr) {
     data: getPointsGeoJson(arr),
   };
 }
+
+export const setFence = (map, coordinates) => {
+  console.log("coordinates:: ", coordinates);
+  const internalPolygonSource = map.getSource("internalPolygon");
+  internalPolygonSource.setData({
+    type: "Polygon",
+    coordinates,
+  });
+};
