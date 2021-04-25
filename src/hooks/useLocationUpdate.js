@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
-import { forEach } from "lodash";
+import React, { useEffect, useState, useCallback } from "react";
+import { forEach, debounce } from "lodash";
 
-export const useLocationUpdate = () => {
+export const useLocationUpdate = (factoryId, shouldSubscribe) => {
   const [ws, setWs] = useState(null);
   // const [lat, setLat] = useState(null);
   // const [long, setLong] = useState(null);
@@ -11,9 +11,14 @@ export const useLocationUpdate = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const newWs = new WebSocket(
-      "ws://127.0.0.1:8000/ws/factory/f2e4c51e-0947-4864-ab81-eeaace5a2c65"
-    );
+    let url;
+
+    if (factoryId && shouldSubscribe) {
+      url = `ws://127.0.0.1:8000/ws/factory/${factoryId}`;
+    } else {
+      url = `ws://127.0.0.1:8000/ws/factory`;
+    }
+    const newWs = new WebSocket(url);
 
     newWs.onmessage = (event) => {
       //   console.log(event);
@@ -37,10 +42,21 @@ export const useLocationUpdate = () => {
               timestamp: dayjs().valueOf(),
             };
 
-            setCoordsObj({ ...coordsObj });
-            // setLat(msg.data.latitude);
-            // setLong(msg.data.longitude);
-            // setUserId(msg.data.userId);
+            const cleanedUpCoordsObj = {};
+            let isChanged = false;
+            // console.log("coordsObj:: ", coordsObj);
+            forEach(coordsObj, (coords, userId) => {
+              isChanged = true;
+              const now = dayjs();
+
+              // console.log("diff:: ", now.diff(coords.timestamp, "second"));
+
+              if (now.diff(coords.timestamp, "second") < 2) {
+                cleanedUpCoordsObj[userId] = coords;
+              }
+            });
+
+            setCoordsObj(cleanedUpCoordsObj);
           }
           break;
         default:
@@ -49,35 +65,16 @@ export const useLocationUpdate = () => {
 
     setWs(newWs);
 
-    // const pointCheckInterval = setInterval(() => {
-    //   const cleanedUpCoordsObj = {};
-    //   let isChanged = false;
-    //   // console.log("coordsObj:: ", coordsObj);
-    //   forEach(coordsObj, (coords, userId) => {
-    //     isChanged = true;
-    //     const now = dayjs();
-
-    //     // console.log("diff:: ", now.diff(coords.timestamp, "second"));
-
-    //     if (now.diff(coords.timestamp, "second") < 2) {
-    //       cleanedUpCoordsObj[userId] = coords;
-    //     }
-    //   });
-    //   // console.log("cleanedUpCoordsObj:: ", cleanedUpCoordsObj);
-    //   if (isChanged) {
-    //     // console.log("Setting up cleaned coords");
-    //     setCoordsObj(cleanedUpCoordsObj);
-    //   }
-    // }, 2000);
-
     return () => {
-      ws && ws.close();
+      setCoordsObj({});
+      newWs && newWs.close();
       // clearInterval(pointCheckInterval);
     };
-  }, []);
+  }, [factoryId, shouldSubscribe]);
 
   useEffect(() => {
     const pointCheckInterval = setInterval(() => {
+      // console.log(coordsObj);
       const cleanedUpCoordsObj = {};
       let isChanged = false;
       // console.log("coordsObj:: ", coordsObj);
@@ -93,14 +90,14 @@ export const useLocationUpdate = () => {
       });
       // console.log("cleanedUpCoordsObj:: ", cleanedUpCoordsObj);
       if (isChanged) {
-        // console.log("Setting up cleaned coords");
+        // console.log("Setting up cleaned coords:: ", cleanedUpCoordsObj);
         setCoordsObj(cleanedUpCoordsObj);
       }
     }, 2000);
 
     return () => clearInterval(pointCheckInterval);
-  }, [coordsObj]);
+  }, []);
 
-  // console.log("outside coordsObj:: ", coordsObj);
+  console.log("outside coordsObj:: ", coordsObj);
   return coordsObj;
 };

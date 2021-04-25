@@ -18,6 +18,7 @@ import {
   setFence,
 } from "./utils";
 import "./App.css";
+import "react-toggle/style.css";
 
 mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
@@ -32,15 +33,19 @@ function App() {
   const [hasMapLoaded, setHasMapLoaded] = useState(false);
   const [factoryObj, setFactoryObj] = useState(null);
   const [factory, setFactory] = useState(null);
-  const coordsObj = useLocationUpdate();
+  const factoryId = get(factory, "id");
+  const [shouldSubscribe, setShouldSubscribe] = useState(false);
+
+  const coordsObj = useLocationUpdate(factoryId, shouldSubscribe);
 
   const [insideCoords, outsideCoords] = separateInsideOutsidePoints(coordsObj);
 
-  // console.log("insideCoords ", insideCoords);
-  // console.log("outsideCoords ", outsideCoords);
-
   const handleFactoryOptions = (factory) => {
     setFactory(factory);
+  };
+
+  const handleSubscribeToggle = (shouldSubscribeValue) => {
+    setShouldSubscribe(shouldSubscribeValue);
   };
 
   useEffect(() => {
@@ -87,7 +92,6 @@ function App() {
     return () => map && map.remove();
   }, []);
 
-  const factoryId = get(factory, "id");
   useEffect(() => {
     if (factory) {
       const coordinates = factory.geofence.coordinates[0];
@@ -116,13 +120,14 @@ function App() {
       outsideSource.setData(getPointsGeoJson(outsideCoords));
     }
   }
-  console.log("factory:: ", factory);
+
   return (
     <div>
       <div className="sidebar">
         <FactoryForm
           factoryObj={factoryObj}
           handleChange={handleFactoryOptions}
+          handleSubscribeChange={handleSubscribeToggle}
         />
       </div>
       <div className="map-container" ref={mapContainer} />
