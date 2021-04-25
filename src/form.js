@@ -6,10 +6,12 @@ export const FactoryForm = ({
   factoryObj,
   handleChange,
   handleSubscribeChange,
+  handleAllPointsChange,
 }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [options, setOptions] = useState([]);
   const [shouldSubscribe, setShouldSubscribe] = useState(false);
+  const [shouldShowAllPoints, setShouldShowAllPoints] = useState(false);
 
   useEffect(() => {
     const newOptions = [];
@@ -34,6 +36,11 @@ export const FactoryForm = ({
     handleSubscribeChange(event.target.checked);
   };
 
+  const handleAllPointsChangeInternal = (event) => {
+    setShouldShowAllPoints(event.target.checked);
+    handleAllPointsChange(event.target.checked);
+  };
+
   const customStyles = {
     container: (provided) => ({
       ...provided,
@@ -52,11 +59,19 @@ export const FactoryForm = ({
       />
       <div style={{ margin: 5, padding: 2 }}>
         <Toggle
-          id="cheese-status"
+          id="subscribe-toggle"
           defaultChecked={shouldSubscribe}
           onChange={handleSubscribeChangeInternal}
         />
-        <label htmlFor="cheese-status">Show only inside points</label>
+        <label htmlFor="cheese-status">Subscribe to inside points</label>
+      </div>
+      <div style={{ margin: 5, padding: 2 }}>
+        <Toggle
+          id="all-points-toggle"
+          defaultChecked={shouldShowAllPoints}
+          onChange={handleAllPointsChangeInternal}
+        />
+        <label htmlFor="cheese-status">Should show all points</label>
       </div>
     </>
   );

@@ -35,6 +35,7 @@ function App() {
   const [factory, setFactory] = useState(null);
   const factoryId = get(factory, "id");
   const [shouldSubscribe, setShouldSubscribe] = useState(false);
+  const [shouldShowAllPoints, setShouldShowAllPoints] = useState(false);
 
   const coordsObj = useLocationUpdate(factoryId, shouldSubscribe);
 
@@ -46,6 +47,13 @@ function App() {
 
   const handleSubscribeToggle = (shouldSubscribeValue) => {
     setShouldSubscribe(shouldSubscribeValue);
+  };
+
+  const handleAllPointsToggle = (shouldShowAllPointsValue) => {
+    // if(!shouldShowAllPointsValue){
+    //   outsideCoords=[]
+    // }
+    setShouldShowAllPoints(shouldShowAllPointsValue);
   };
 
   useEffect(() => {
@@ -117,7 +125,9 @@ function App() {
     }
 
     if (outsideSource) {
-      outsideSource.setData(getPointsGeoJson(outsideCoords));
+      if (shouldShowAllPoints)
+        outsideSource.setData(getPointsGeoJson(outsideCoords));
+      else outsideSource.setData(getPointsGeoJson([]));
     }
   }
 
@@ -128,6 +138,7 @@ function App() {
           factoryObj={factoryObj}
           handleChange={handleFactoryOptions}
           handleSubscribeChange={handleSubscribeToggle}
+          handleAllPointsChange={handleAllPointsToggle}
         />
       </div>
       <div className="map-container" ref={mapContainer} />
