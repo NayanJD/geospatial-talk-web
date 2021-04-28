@@ -36,8 +36,14 @@ function App() {
   const factoryId = get(factory, "id");
   const [shouldSubscribe, setShouldSubscribe] = useState(false);
   const [shouldShowAllPoints, setShouldShowAllPoints] = useState(false);
+  const [distance, setDistance] = useState(0);
 
-  const coordsObj = useLocationUpdate(factoryId, shouldSubscribe);
+  const coordsObj = useLocationUpdate(
+    factoryId,
+    shouldSubscribe,
+    shouldShowAllPoints,
+    distance
+  );
 
   const [insideCoords, outsideCoords] = separateInsideOutsidePoints(coordsObj);
 
@@ -54,6 +60,10 @@ function App() {
     //   outsideCoords=[]
     // }
     setShouldShowAllPoints(shouldShowAllPointsValue);
+  };
+
+  const handleDistanceChange = (distance) => {
+    setDistance(distance);
   };
 
   useEffect(() => {
@@ -131,6 +141,7 @@ function App() {
     }
   }
 
+  console.log("shouldSubscribe ", shouldSubscribe);
   return (
     <div>
       <div className="sidebar">
@@ -139,6 +150,7 @@ function App() {
           handleChange={handleFactoryOptions}
           handleSubscribeChange={handleSubscribeToggle}
           handleAllPointsChange={handleAllPointsToggle}
+          handleDistanceChange={handleDistanceChange}
         />
       </div>
       <div className="map-container" ref={mapContainer} />
