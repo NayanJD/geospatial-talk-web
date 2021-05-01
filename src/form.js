@@ -92,8 +92,17 @@ export const FactoryForm = ({
   const customStyles = {
     container: (provided) => ({
       ...provided,
-      width: 250,
+      width: "100%",
     }),
+    options: (styles) => {
+      return {
+        ...styles,
+        backgroundColor: "black",
+        color: "black",
+      };
+    },
+    menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
+    menu: (provided) => ({ ...provided, zIndex: 9999 }),
   };
 
   // console.log("shouldSubscribe:: ", shouldSubscribe);
@@ -111,7 +120,9 @@ export const FactoryForm = ({
           defaultChecked={shouldSubscribe}
           onChange={handleSubscribeChangeInternal}
         />
-        <label htmlFor="cheese-status">Inside points</label>
+        <label style={{ color: "white" }} htmlFor="cheese-status">
+          Inside points
+        </label>
       </div>
       <div style={{ margin: 5, padding: 2 }}>
         <Toggle
@@ -119,11 +130,14 @@ export const FactoryForm = ({
           defaultChecked={shouldShowAllPoints}
           onChange={handleAllPointsChangeInternal}
         />
-        <label htmlFor="cheese-status">All Points</label>
+        <label style={{ color: "white" }} htmlFor="cheese-status">
+          All Points
+        </label>
       </div>
       <div>
         <CssTextField
           type="number"
+          size="small"
           label="Distance"
           id="outlined-size-normal"
           defaultValue="Normal"
@@ -141,7 +155,7 @@ export const FactoryForm = ({
       <div style={{ margin: 5, padding: 2 }}>
         <Button
           variant="contained"
-          style={{ marginLeft: 10 }}
+          style={{ width: "100%" }}
           onClick={() => handleResetPoints()}
         >
           clear all points

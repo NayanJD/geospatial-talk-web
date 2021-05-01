@@ -130,12 +130,17 @@ function App() {
       const coordinates = factory.geofence.coordinates[0];
 
       const center = turf.center(turf.points(coordinates));
+
       const flyToCoords = center.geometry.coordinates;
+
       if (map) {
+        const bbox = turf.bbox(turf.polygon(factory.geofence.coordinates));
+
+        map.fitBounds(bbox, { padding: 200 });
         // map.flyTo({
         //   center: flyToCoords,
         // });
-        map.panTo(flyToCoords);
+        // map.panTo(flyToCoords);
         setFence(map, [coordinates]);
       }
     }

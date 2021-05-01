@@ -109,7 +109,7 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
     layout: {},
     paint: {
       "line-color": "#FF0000",
-      "line-width": 3,
+      "line-width": 2,
     },
   });
 }
