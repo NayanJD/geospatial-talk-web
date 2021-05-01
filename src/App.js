@@ -66,6 +66,21 @@ function App() {
     setDistance(distance);
   };
 
+  const handleResetPoints = () => {
+    if (map && hasMapLoaded) {
+      const insideSource = map.getSource("insidePoint");
+      const outsideSource = map.getSource("outsidePoint");
+
+      if (insideSource) {
+        insideSource.setData(getPointsGeoJson([]));
+      }
+
+      if (outsideSource) {
+        outsideSource.setData(getPointsGeoJson([]));
+      }
+    }
+  };
+
   useEffect(() => {
     // console.log(lat, lng);
 
@@ -151,6 +166,7 @@ function App() {
           handleSubscribeChange={handleSubscribeToggle}
           handleAllPointsChange={handleAllPointsToggle}
           handleDistanceChange={handleDistanceChange}
+          handleResetPoints={handleResetPoints}
         />
       </div>
       <div className="map-container" ref={mapContainer} />

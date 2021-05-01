@@ -85,6 +85,11 @@ export const useLocationUpdate = (
   }, [factoryId, shouldSubscribe, shouldShowAllPoints, distance]);
 
   // useEffect(() => {
+  //   if (resetPoints) {
+  //     setCoordsObj({});
+  //   }
+  // }, [resetPoints]);
+  // useEffect(() => {
   //   const pointCheckInterval = setInterval(() => {
   //     // console.log(coordsObj);
   //     const cleanedUpCoordsObj = {};

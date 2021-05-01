@@ -53,6 +53,7 @@ export const FactoryForm = ({
   handleSubscribeChange,
   handleAllPointsChange,
   handleDistanceChange,
+  handleResetPoints,
 }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [options, setOptions] = useState([]);
@@ -91,7 +92,7 @@ export const FactoryForm = ({
   const customStyles = {
     container: (provided) => ({
       ...provided,
-      width: 300,
+      width: 250,
     }),
   };
 
@@ -110,7 +111,7 @@ export const FactoryForm = ({
           defaultChecked={shouldSubscribe}
           onChange={handleSubscribeChangeInternal}
         />
-        <label htmlFor="cheese-status">Subscribe to inside points</label>
+        <label htmlFor="cheese-status">Inside points</label>
       </div>
       <div style={{ margin: 5, padding: 2 }}>
         <Toggle
@@ -118,23 +119,34 @@ export const FactoryForm = ({
           defaultChecked={shouldShowAllPoints}
           onChange={handleAllPointsChangeInternal}
         />
-        <label htmlFor="cheese-status">Should show all points</label>
+        <label htmlFor="cheese-status">All Points</label>
       </div>
-      <CssTextField
-        type="number"
-        label="Distance"
-        id="outlined-size-normal"
-        defaultValue="Normal"
-        variant="outlined"
-        onChange={(event) => setDistance(parseInt(event.target.value))}
-      />
-      <Button
-        variant="contained"
-        style={{ marginLeft: 10 }}
-        onClick={() => handleDistanceChange(distance)}
-      >
-        Apply
-      </Button>
+      <div>
+        <CssTextField
+          type="number"
+          label="Distance"
+          id="outlined-size-normal"
+          defaultValue="Normal"
+          variant="outlined"
+          onChange={(event) => setDistance(parseInt(event.target.value))}
+        />
+        <Button
+          variant="contained"
+          style={{ marginLeft: 10 }}
+          onClick={() => handleDistanceChange(distance)}
+        >
+          Apply
+        </Button>
+      </div>
+      <div style={{ margin: 5, padding: 2 }}>
+        <Button
+          variant="contained"
+          style={{ marginLeft: 10 }}
+          onClick={() => handleResetPoints()}
+        >
+          clear all points
+        </Button>
+      </div>
     </>
   );
 };
