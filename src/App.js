@@ -45,7 +45,10 @@ function App() {
     distance
   );
 
-  const [insideCoords, outsideCoords] = separateInsideOutsidePoints(coordsObj);
+  const [insideCoords, outsideCoords] = separateInsideOutsidePoints(
+    coordsObj,
+    shouldSubscribe
+  );
 
   const handleFactoryOptions = (factory) => {
     setFactory(factory);

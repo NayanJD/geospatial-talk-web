@@ -114,12 +114,12 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
   });
 }
 
-export function separateInsideOutsidePoints(coordsObj) {
+export function separateInsideOutsidePoints(coordsObj, isSubscribed) {
   const insideCoords = [],
     outsideCoords = [];
 
   forEach(coordsObj, (coord) => {
-    if (coord.isInside) {
+    if (coord.isInside && isSubscribed) {
       insideCoords.push(coord);
     } else {
       outsideCoords.push(coord);
