@@ -21,8 +21,7 @@ import "./App.css";
 import "react-toggle/style.css";
 
 mapboxgl.workerClass = MapboxWorker;
-mapboxgl.accessToken =
-  "pk.eyJ1IjoibmF5YW5qIiwiYSI6ImNrbmFtZTVhcTBwMTcyeGxjOTE0N3AyMHMifQ._pHKxQv0HuH4HvnYygGJZg";
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 function App() {
   const mapContainer = useRef();
