@@ -4,6 +4,8 @@ import { get } from "lodash";
 import axios from "axios";
 import * as turf from "@turf/turf";
 import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import MapboxWorker from "worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker";
 import logo from "./logo.svg";
@@ -114,14 +116,24 @@ function App() {
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
       // center: center.geometry.coordinates,
-      center: [77.5946, 12.9716],
+      center: [4.8056466, 52.4446596],
       zoom: zoom,
     });
+    let Draw = new MapboxDraw({
+      // displayControlsDefault: false,
+      // // Select which mapbox-gl-draw control buttons to add to the map.
+      // controls: {
+      //   polygon: true,
+      //   trash: true,
+      // },
+    });
+
+    newMap.addControl(Draw, "top-right");
 
     newMap.on("load", function () {
       setHasMapLoaded(true);
 
-      initializeMap(newMap, insideCoords, outsideCoords);
+      initializeMap(newMap, insideCoords, outsideCoords, Draw);
     });
     setMap(newMap);
     return () => map && map.remove();
@@ -131,7 +143,9 @@ function App() {
     if (factory) {
       const coordinates = factory.geofence.coordinates[0];
 
-      const center = turf.center(turf.points(coordinates));
+      const center = turf.center(
+        turf.points(77.55571494673643, 12.99083812808039)
+      );
 
       const flyToCoords = center.geometry.coordinates;
 
@@ -142,7 +156,7 @@ function App() {
         // map.flyTo({
         //   center: flyToCoords,
         // });
-        // map.panTo(flyToCoords);
+        map.panTo(flyToCoords);
         setFence(map, [coordinates]);
       }
     }

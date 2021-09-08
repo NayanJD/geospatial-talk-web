@@ -1,6 +1,70 @@
 import { reduce, forEach, map } from "lodash";
+import * as turf from "@turf/turf";
+export function initializeMap(newMap, insideCoords, outsideCoords, Draw) {
+  //Akanksha's
+  // let _center = turf.point([77.55571494673643, 12.99083812808039]);
 
-export function initializeMap(newMap, insideCoords, outsideCoords) {
+  //Illia
+  let _center = turf.point([4.8056466, 52.4446596]);
+
+  // let _radius = 5;
+  let _options = {
+    steps: 80,
+    units: "kilometers", // or "mile"
+  };
+
+  let colorArr = ["black", "green", "blue", "orange", "red"];
+  for (let i = 0; i < 5; i++) {
+    let _radius = 5 + i * 5;
+    let _circle = turf.circle(_center, _radius, _options);
+
+    console.log("source ", `circleData${i}`);
+    newMap.addSource(`circleData${i}`, {
+      type: "geojson",
+      data: _circle,
+    });
+
+    newMap.addLayer({
+      id: `circleData${i}`,
+      type: "fill",
+      source: `circleData${i}`,
+      paint: {
+        "fill-color": colorArr[i],
+        // "circle-color": "red",
+        "fill-opacity": 0.1,
+      },
+    });
+
+    // if (i === 0) {
+    //   newMap.addLayer({
+    //     id: "circle-fill",
+    //     type: "fill",
+    //     source: `circleData${i}`,
+    //     paint: {
+    //       "fill-color": colorArr[i],
+    //       // "circle-color": "red",
+    //       "fill-opacity": 0.2,
+    //     },
+    //   });
+    // } else {
+    //   newMap.addLayer(
+    //     {
+    //       id: "circle-fill",
+    //       type: "fill",
+    //       source: `circleData${i}`,
+    //       paint: {
+    //         "fill-color": colorArr[i],
+    //         // "circle-color": "red",
+    //         "fill-opacity": 0.2,
+    //       },
+    //     },
+    //     `circleData${i - 1}`
+    //   );
+    // }
+  }
+
+  // newMap.moveLayer("circleData1", "circleData2");
+
   let insideCoordData = getPointsFeature(insideCoords);
   let outsideCoordData = getPointsFeature(outsideCoords);
 
@@ -112,6 +176,10 @@ export function initializeMap(newMap, insideCoords, outsideCoords) {
       "line-width": 2,
     },
   });
+
+  newMap.on("draw.create", updateArea(Draw));
+  newMap.on("draw.update", updateArea(Draw));
+  newMap.on("draw.delete", updateArea(Draw));
 }
 
 export function separateInsideOutsidePoints(coordsObj, isSubscribed) {
@@ -163,3 +231,11 @@ export const setFence = (map, coordinates) => {
     coordinates,
   });
 };
+
+function updateArea(draw) {
+  return (e) => {
+    const data = draw.getAll();
+
+    console.log("draw data ", JSON.stringify(data, null, 2));
+  };
+}
